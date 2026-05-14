@@ -1,0 +1,18 @@
+# Mainstreaminess Analysis Project - Requirements
+# Generated for Dogukan
+
+# Core Data Manipulation
+pandas
+openpyxl
+numpy<2.0.0
+
+# Scientific & Math
+scipy
+
+# Machine Learning & Recommender Systems
+scikit-learn
+
+# Utilities
+# (Opsiyonel: Eğer grafik çizdirmek istersen ekleyebilirsin)
+# matplotlib
+# seaborn
