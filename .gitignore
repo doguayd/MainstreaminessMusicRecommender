@@ -42,6 +42,26 @@ midterm/final_report_v8.docx
 *.7z
 
 # =============================================
+# Root-level duplicate scripts (copies exist in first-progress/)
+# =============================================
+/User-recommender.py
+/recom.py
+/maintream.py
+/mainstream_big.py
+
+# =============================================
+# Root-level old/intermediate report files
+# =============================================
+/code_explanation.docx
+/final_report.docx
+/final_report_v2.docx
+/line_by_line.docx
+/line_by_line_v2.docx
+/mainstreaminess_report.docx
+/mainstreaminess_report_v2.docx
+/recommender-report.docx
+
+# =============================================
 # Personal / private notes
 # =============================================
 sohbet_gecmisi.md
