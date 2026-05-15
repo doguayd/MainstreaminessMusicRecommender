@@ -16,11 +16,12 @@ warnings.filterwarnings('ignore')
 # ============================================================
 # LOAD DATASET FROM EXCEL
 # ============================================================
-# dataset_large.xlsx must be in the same directory as this script.
-# Sheet "Playcounts" : user-artist playcount matrix
+# dataset_lfm.xlsx  : real Last.fm 360K data  (489 users x 81 artists x 12 countries)
+# dataset_large.xlsx: AI-generated synthetic data (500 users x 81 artists x 12 countries)
+# Sheet "Playcounts" : user-artist playcount matrix (header row = 3, i.e. header=2)
 # Sheet "Artists"    : artist metadata
 
-DATASET_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataset_large.xlsx")
+DATASET_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataset_lfm.xlsx")
 
 raw = pd.read_excel(DATASET_PATH, sheet_name="Playcounts", header=2)
 raw = raw.rename(columns={

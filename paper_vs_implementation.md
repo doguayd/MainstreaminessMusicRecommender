@@ -171,12 +171,13 @@ Makale esas olarak bir **analiz çalışmasıdır** — yani bir şeyler öneril
 
 | | Makale | Bizim implementasyon |
 |---|---|---|
-| **Veri kaynağı** | LFM-1b (gerçek, 1 milyar kayıt) | `dataset_large.xlsx` (AI-üretimi, 500 kullanıcı) |
-| **Gerçek veri** | ✅ var | `dataset_lfm.xlsx` (Last.fm 360K'dan türetildi) |
-| **Kullanıcı sayısı** | ~120,000 | 500 (sentetik) / 489 (gerçek) |
-| **Sanatçı sayısı** | ~600,000 | 81 |
+| **Veri kaynağı** | LFM-1b (gerçek, 1 milyar kayıt) | `dataset_lfm.xlsx` — Last.fm 360K'dan türetildi (gerçek veri) |
+| **Yedek/test verisi** | — | `dataset_large.xlsx` — AI-üretimi sentetik (500 kullanıcı) |
+| **Kullanıcı sayısı** | ~120,000 | 489 (gerçek) |
+| **Sanatçı sayısı** | ~600,000 | 81 (top-81, min 5 dinleyici) |
 | **Ülke sayısı** | 47 | 12 (TR, US, DE, GB, FR, PL, BR, FI, SE, RU, JP, KR) |
-| **Neden?** | Ders kapsamında bu boyut gerekli değil; hoca "dataset büyütmeni istemiyorum" dedi |
+| **Ham veri kaynağı** | LFM-1b (kamuya kapalı) | Last.fm 360K (Celma 2010 — kamuya açık) |
+| **Neden alt küme?** | — | 360K veri doğrudan kullanılamaz (17.5M satır, matris ops için çok büyük); `lastfm_to_excel.py` ile top-81 sanatçı + proportional ülke örneklemesi yapıldı |
 
 #### Fark 2 — AF·ILF Global Profil (ERR-017 Düzeltmesi)
 
@@ -269,14 +270,20 @@ novelty = 1 - mean(heard_fraction)   # heard_fraction = kaç öneri zaten dinlen
 personalization = mean( 1 - |A∩B| / |A∪B| )  # tüm kullanıcı çiftleri üzerinden
 ```
 
-Sonuçlar (50 kullanıcı örneklem):
+Sonuçlar (50 kullanıcı örneklem, `dataset_lfm.xlsx` — gerçek Last.fm verisi):
 
 | Metod | Novelty | Personalization |
 |---|---|---|
-| Popularity Baseline | 0.000 | 0.000 |
-| User-KNN (k=10) | 1.000 | 0.905 |
-| SVD (20 factors) | 1.000 | 0.933 |
-| **Proposed (MS-AF·ILF)** | **0.100** | **0.189** |
+| Popularity Baseline | 0.848 | 0.000 |
+| User-KNN (k=10) | 1.000 | 0.947 |
+| SVD (20 factors) | 1.000 | 0.952 |
+| **Proposed (MS-AF·ILF)** | **1.000** | **0.335** |
+
+> Gerçek Last.fm verisiyle önerilen metodun Novelty'si 0.100'den 1.000'e yükseldi:
+> gerçek kullanıcılar daha çeşitli dinleme geçmişine sahip olduğundan already-heard
+> filtreleme çok daha etkili çalışıyor. Popularity Baseline Novelty'si de 0.000'dan
+> 0.848'e yükseldi: farklı ülkelerden gerçek kullanıcılar global top-5'i çok daha az oranda
+> daha önce duymuş.
 
 ---
 
@@ -293,19 +300,24 @@ sonuçları yanıltmıyor.
 
 ---
 
-#### Ekleme 5 — Last.fm 360K'dan Gerçek Veri Seti Türetme
+#### Ekleme 5 — Last.fm 360K'dan Gerçek Veri Seti Türetme ve Kullanımı
 
-Makale LFM-1b kullanıyor ama bu veri seti kamuya açık değil.
-Biz Last.fm 360K'dan (kamuya açık) bir alt küme oluşturduk:
+Makale LFM-1b kullanıyor (kamuya kapalı). Biz kamuya açık Last.fm 360K'dan
+(Celma 2010) bir alt küme oluşturduk ve bu veriyi **asıl dataset** olarak kullanıyoruz:
 
 ```python
-# lastfm_to_excel.py — bizim dönüştürücü scriptimiz
+# lastfm_to_excel.py — dönüştürücü scriptimiz
 # Top 81 sanatçı (≥5 dinleyici), proportional ülke örneklemesi
 # → dataset_lfm.xlsx: 489 kullanıcı × 81 sanatçı × 12 ülke
+
+# Mainstream_final.py — asıl dataset olarak LFM verisi:
+DATASET_PATH = os.path.join(..., "dataset_lfm.xlsx")
 ```
 
 Aynı şema (Playcounts / Artists / Users / Countries sheet'leri),
-`Mainstream_final.py` ile doğrudan uyumlu.
+`Mainstream_final.py` ile doğrudan uyumlu. Ham 360K TSV dosyaları
+(17.5M satır, ~2 GB) repoya dahil edilmedi — `lastfm_to_excel.py`
+ile yeniden üretilebilir.
 
 ---
 
