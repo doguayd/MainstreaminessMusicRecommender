@@ -193,7 +193,7 @@ print(country_avg[key].sort_values("Cg:AF,u:AF", ascending=False).to_string())
 
 # ── Low / Mid / High classification ──────────────────────────────────────
 scores     = results_df["Cc:AF,u:AF"].values
-thresholds = [np.percentile(scores, 33), np.percentile(scores, 66)]
+thresholds = [np.nanpercentile(scores, 33), np.nanpercentile(scores, 66)]
 
 def classify(v):
     """
